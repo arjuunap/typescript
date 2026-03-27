@@ -1,0 +1,71 @@
+interface Task{
+    id : number,
+    title : string,
+    completed : boolean
+}
+
+class Taskmanager {
+    private tasks : Task [] = [];
+
+
+    addTask(title : string):void{
+        const newTask : Task = {
+            id : Date.now(),
+            title,
+            completed : false
+        };
+        this.tasks.push(newTask);
+        this.render();
+    }
+    toggle(id:number):void{
+        this.tasks = this.tasks.map(task => 
+            task.id === id ? {...task,completed : !task.completed} : task
+
+        );
+        this.render();
+    }
+    deleteTask(id:number):void{
+        this.tasks = this.tasks.filter(task => task.id !== id);
+        this.render();
+    }
+    render():void{
+        const list = document.getElementById("taskList") as HTMLUListElement;
+        list.innerHTML = "";
+        this.tasks.forEach(task =>{
+            const li = document.createElement("li")
+            li.textContent = task.title
+            li.style.cursor = "pointer";
+            if (task.completed){
+                li.style.textDecoration = "line-through"
+            }
+
+            li.addEventListener("click",()=>{
+                this.toggle(task.id);
+            })
+
+            const delBtn = document.createElement("button");
+            delBtn.textContent = "Delete";
+            
+            li.appendChild(delBtn)
+
+            delBtn.addEventListener("click",(e)=>{
+                e.stopPropagation();
+                this.deleteTask(task.id)
+            })
+            
+            list.appendChild(li)
+        })
+       
+        
+    }
+}
+const input = document.getElementById("taskInput") as HTMLInputElement;
+const btn = document.getElementById('addBtn') as HTMLButtonElement;
+const m1 = new Taskmanager()
+
+btn.addEventListener("click",() =>{
+    if (input.value.trim() === "") return;
+
+    m1.addTask(input.value);
+    input.value = "";
+})
